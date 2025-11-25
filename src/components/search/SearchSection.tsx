@@ -4,7 +4,15 @@ import { useEffect, useState } from "react";
 
 import MovieCard from "@/components/cards/MovieCard";
 import SeriesCard from "@/components/cards/SeriesCard";
-import type { MediaItem } from "@/lib/tmdb";
+import type { MediaItem, Movie, Series } from "@/lib/tmdb";
+
+function isMovie(item: MediaItem): item is Movie {
+  return item.media_type === "movie";
+}
+
+function isSeries(item: MediaItem): item is Series {
+  return item.media_type === "tv";
+}
 
 const SearchSection = () => {
   const [query, setQuery] = useState("");
@@ -73,11 +81,11 @@ const SearchSection = () => {
       {results.length > 0 && (
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {results.map((item) =>
-            item.media_type === "movie" ? (
+            isMovie(item) ? (
               <MovieCard key={`movie-${item.id}`} movie={item} />
-            ) : (
+            ) : isSeries(item) ? (
               <SeriesCard key={`series-${item.id}`} series={item} />
-            ),
+            ) : null
           )}
         </div>
       )}
