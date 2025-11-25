@@ -2,11 +2,11 @@
 
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, Suspense, useEffect, useState } from "react";
 
 import { useAuth } from "@/context/AuthContext";
 
-const LoginPage = () => {
+const LoginForm = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { login, loginWithGoogle, loading, user, authReady } = useAuth();
@@ -137,6 +137,25 @@ const LoginPage = () => {
         </p>
       </div>
     </div>
+  );
+};
+
+const LoginPage = () => {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex min-h-[70vh] items-center justify-center">
+          <div className="w-full max-w-md rounded-[var(--radius)] border border-white/10 bg-white/5 p-8 shadow-2xl shadow-blue-900/20">
+            <h1 className="text-3xl font-semibold text-white">Welcome back</h1>
+            <p className="mt-2 text-sm text-slate-300">
+              Loading...
+            </p>
+          </div>
+        </div>
+      }
+    >
+      <LoginForm />
+    </Suspense>
   );
 };
 
