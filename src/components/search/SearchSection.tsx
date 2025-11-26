@@ -61,7 +61,7 @@ const SearchSection = () => {
           <p className="text-xs uppercase tracking-[0.3em] text-blue-300">
             Universal Search
           </p>
-          <h2 className="text-2xl font-semibold">Find your next watch</h2>
+          <h2 className="text-2xl font-semibold">Search your watched movies & shows</h2>
           <p className="text-sm text-slate-400">
             Search for movies or series across every provider.
           </p>
