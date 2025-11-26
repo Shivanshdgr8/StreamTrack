@@ -15,7 +15,7 @@ const navItems = [
 const Header = () => {
   const pathname = usePathname();
   const router = useRouter();
-  const { user, logout, loading, authReady } = useAuth();
+  const { user, userName, logout, loading, authReady } = useAuth();
   const [isSigningOut, setIsSigningOut] = useState(false);
 
   const activeMap = useMemo(() => {
@@ -67,7 +67,7 @@ const Header = () => {
                 user ? (
                 <>
                   <span className="hidden text-xs text-slate-400 sm:inline">
-                    {user.email}
+                    {userName || user.displayName || user.email?.split("@")[0] || "User"}
                   </span>
                   <button
                     onClick={handleLogout}

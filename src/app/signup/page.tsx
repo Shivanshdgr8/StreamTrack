@@ -9,6 +9,7 @@ import { useAuth } from "@/context/AuthContext";
 const SignupPage = () => {
   const router = useRouter();
   const { signup, user, loading, authReady } = useAuth();
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -30,7 +31,7 @@ const SignupPage = () => {
     setError(null);
     setIsSubmitting(true);
     try {
-      await signup(email, password);
+      await signup(email, password, name);
       router.replace("/login?signup=success");
     } catch (err) {
       setError(
@@ -61,6 +62,20 @@ const SignupPage = () => {
         </p>
 
         <form className="mt-6 space-y-4" onSubmit={handleSubmit}>
+          <div className="space-y-2">
+            <label className="text-sm text-slate-300" htmlFor="name">
+              Name
+            </label>
+            <input
+              id="name"
+              type="text"
+              value={name}
+              onChange={(event) => setName(event.target.value)}
+              className="w-full rounded-md border border-white/10 bg-black/40 px-4 py-3 text-sm text-white outline-none ring-blue-500/0 transition focus:ring-2"
+              placeholder="Your name"
+              required
+            />
+          </div>
           <div className="space-y-2">
             <label className="text-sm text-slate-300" htmlFor="email">
               Email
