@@ -1,54 +1,59 @@
-## StreamTrack
+# StreamTrack
 
-StreamTrack is a Next.js 14 + TailwindCSS experience for tracking trending movies & series, filtering by OTT providers, and maintaining a local “watched” vault powered by TMDB.
+StreamTrack is a premium movie and series tracking application designed to help you organize your entertainment life. Built with Next.js, Firebase, and TMDB.
 
-### Tech Stack
+## Features
 
-- Next.js 14 (App Router) + React 19
-- TailwindCSS v4 (via `@tailwindcss/postcss`)
-- TMDB API for media, providers, and search
-- LocalStorage for persisting watched items on-device
+-   **Dashboard & Discovery**:
+    -   Trending Movies & TV Shows.
+    -   Dedicated "Popular" sections for Movies and Series.
+    -   Comprehensive Search (Movies & TV).
+    -   Details view with cast, ratings, and release info.
 
-### Environment
+-   **Personal Library**:
+    -   **Watch Later**: Save items you want to see.
+    -   **Watched History**: Mark items as watched.
+    -   **Smart Status**: Visual indicators (Check/Plus/Eye) on all cards show your interaction status instantly.
 
-Create a `.env.local` in the project root with your TMDB & Firebase credentials:
+-   **Authentication**:
+    -   **Google Sign-In**: One-click login.
+    -   **Email/Password**: Create an account with your email.
+    -   **Account Management**: Update your display name or delete your account securely.
 
-```
-TMDB_API_KEY=your_tmdb_api_key
-# Optional, defaults to IN
-TMDB_REGION=IN
-# Optional tuning for network conditions
-TMDB_MAX_RETRIES=2
-TMDB_TIMEOUT_MS=8000
-NEXT_PUBLIC_FIREBASE_API_KEY=your_firebase_api_key
-NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your_project.firebaseapp.com
-NEXT_PUBLIC_FIREBASE_PROJECT_ID=your_project_id
-NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=your_project.appspot.com
-NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
-NEXT_PUBLIC_FIREBASE_APP_ID=your_app_id
-```
+-   **Performance & UX**:
+    -   **Instant Interactivity**: Buttons work immediately, even before full hydration.
+    -   **Optimized Routing**: Fast transitions and persistent state using standard URL parameters.
+    -   **Responsive Design**: Fully mobile-responsive layout with glassmorphism UI.
 
-You can grab an API key from [developer.themoviedb.org](https://developer.themoviedb.org/).
+## Tech Stack
+-   **Framework**: Next.js 14+ (App Router)
+-   **Styling**: Tailwind CSS, Lucide Icons, Shadcn UI Concepts
+-   **Backend**: Firebase Auth, Firestore
+-   **Data Source**: TMDB API
 
-After configuring Firebase, apply the Firestore security rules in `firestore.rules` to ensure each user can only read/write their own watched collections.
+## Getting Started
 
-### Available Scripts
+1.  **Install dependencies**:
+    ```bash
+    npm install
+    ```
 
-```bash
-npm run dev    # start the Next.js dev server on http://localhost:3000
-npm run build  # create a production build
-npm run start  # serve the production build
-npm run lint   # run ESLint
-```
+2.  **Environment Setup**:
+    Create `.env.local` with the following:
+    ```env
+    NEXT_PUBLIC_TMDB_API_KEY=your_key
+    NEXT_PUBLIC_TMDB_IMAGE_BASE_URL=https://image.tmdb.org/t/p/original
+    NEXT_PUBLIC_FIREBASE_API_KEY=...
+    NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=...
+    NEXT_PUBLIC_FIREBASE_PROJECT_ID=...
+    NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=...
+    NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=...
+    NEXT_PUBLIC_FIREBASE_APP_ID=...
+    ```
 
-### Features
+3.  **Run the development server**:
+    ```bash
+    npm run dev
+    ```
 
-- **Homepage**: trending movies & series grids with OTT badges, instant TMDB-backed search, and “Mark as Watched” buttons.
-- **Providers**: `/providers` lists OTT partners; selecting one loads its movie & series catalog via TMDB’s watch/providers endpoints.
-- **Watched Lists**: `/watched` reads from LocalStorage, splitting watched movies vs series (data is scoped per device).
-- **LocalStorage helpers**: shared functions (`getWatchedMovies`, `addWatchedMovie`, etc.) ensure consistent storage logic across components.
-
-### Notes
-
-- Provider availability is region-aware (defaults to India). Set `TMDB_REGION` to match your market.
-- LocalStorage means watched data does **not** sync across browsers/devices. Clear storage to reset the vault.
+4.  **Open**: [http://localhost:3000](http://localhost:3000)
