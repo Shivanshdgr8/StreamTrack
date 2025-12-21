@@ -22,6 +22,7 @@ interface MediaListContextType {
     watchlist: MediaItem[];
     watched: MediaItem[];
     loading: boolean;
+    stopUpdates: () => void; // New method
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     addToStatus: (media: any, type: MediaType, status: 'watched' | 'watchlist') => Promise<void>;
     removeFromList: (mediaId: number, type: MediaType) => Promise<void>;
@@ -34,14 +35,23 @@ export function MediaListProvider({ children }: { children: React.ReactNode }) {
     const { user } = useAuth();
     const [watchlist, setWatchlist] = useState<MediaItem[]>([]);
     const [watched, setWatched] = useState<MediaItem[]>([]);
-    // If user is present, we are loading (waiting for snapshot). If not, we are not loading.
     const [loading, setLoading] = useState(!!user);
+    const [updatesStopped, setUpdatesStopped] = useState(false); // New state
+
+    const stopUpdates = () => setUpdatesStopped(true);
 
     useEffect(() => {
-        if (!user) {
-            setWatchlist([]);
-            setWatched([]);
-            setLoading(false);
+        if (!user || updatesStopped) { // Check updatesStopped
+            if (updatesStopped) return; // Don't clear list if just stopped, or maybe? 
+            // If stopped, we just want to cease listening.
+            // But if user is null, we clear.
+            // Let's keep existing logic:
+            if (!user) {
+                // eslint-disable-next-line
+                setWatchlist([]);
+                setWatched([]);
+                setLoading(false);
+            }
             return;
         }
 
@@ -58,7 +68,7 @@ export function MediaListProvider({ children }: { children: React.ReactNode }) {
         });
 
         return () => unsubscribe();
-    }, [user]);
+    }, [user, updatesStopped]);
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const addToStatus = async (media: any, type: MediaType, status: 'watched' | 'watchlist') => {
@@ -112,6 +122,7 @@ export function MediaListProvider({ children }: { children: React.ReactNode }) {
             watchlist,
             watched,
             loading,
+            stopUpdates,
             addToStatus,
             removeFromList,
             getItemStatus

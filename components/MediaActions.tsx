@@ -6,8 +6,9 @@ import { Check, Plus, Clock } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export default function MediaActions({ media, type }: { media: any, type: MediaType }) {
-    const { user, signInWithGoogle } = useAuth();
+    const { user } = useAuth();
     const { addToStatus, removeFromList, getItemStatus, loading } = useMediaList();
     const status = getItemStatus(media.id, type);
     const router = useRouter();

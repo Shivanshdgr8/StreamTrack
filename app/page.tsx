@@ -1,16 +1,45 @@
-import { getTrending, getPopularMovies, getPopularSeries } from "@/lib/tmdb";
+import { getTrending, getPopularMovies, getPopularSeries, getWatchProviders } from "@/lib/tmdb";
 import { Button } from "@/components/ui/button";
-import { Info, Play, ArrowRight } from "lucide-react";
+import { Info, ArrowRight } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { TMDB_IMAGE_BASE_URL } from "@/lib/tmdb";
 import MediaCard from "@/components/MediaCard";
 
+// Helper to fetch providers for a list of items
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+async function withProviders(items: any[]) {
+  return Promise.all(items.map(async (item) => {
+    try {
+      // Use media_type from item or default 'movie'/'tv' based on context if logic requires, 
+      // but here we might not know type if generic trending.
+      // Trending items have media_type.
+      // Popular Movies have type 'movie' implicit? No, popular endpoint items don't always have media_type set.
+      // We must pass type.
+      const type = item.media_type || (item.title ? 'movie' : 'tv');
+      // Safe guess: title usually implies movie, name implies tv in TMDB.
+
+      const providers = await getWatchProviders(type, item.id);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const flatrate = providers?.results?.['IN']?.flatrate || providers?.results?.['US']?.flatrate || null;
+      return { ...item, providers: flatrate };
+    } catch {
+      return item;
+    }
+  }));
+}
+
 export default async function Home() {
-  const trending = await getTrending();
-  const popularMovies = await getPopularMovies();
-  const popularSeries = await getPopularSeries();
-  const featured = trending.results[0]; // Just take the first one for hero
+  const trendingData = await getTrending();
+  const moviesData = await getPopularMovies();
+  const seriesData = await getPopularSeries();
+
+  const trending = { ...trendingData, results: await withProviders(trendingData.results.slice(1, 11)) };
+  const popularMovies = { ...moviesData, results: await withProviders(moviesData.results.slice(0, 5)) };
+  const popularSeries = { ...seriesData, results: await withProviders(seriesData.results.slice(0, 5)) };
+
+  // For featured, we might not need providers icon on the Hero button, but let's leave it.
+  const featured = trendingData.results[0]; // Original raw item
 
   return (
     <div className="min-h-screen pb-20">
@@ -53,8 +82,9 @@ export default async function Home() {
       <section className="container mx-auto px-4 mt-8">
         <h2 className="text-2xl font-semibold mb-6">Trending Now</h2>
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6">
-          {trending.results.slice(1, 11).map((item: any) => (
-            <MediaCard key={item.id} item={item} />
+          {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+          {trending.results.map((item: any) => (
+            <MediaCard key={item.id} item={item} providers={item.providers} />
           ))}
         </div>
       </section>
@@ -68,8 +98,9 @@ export default async function Home() {
           </Link>
         </div>
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6">
-          {popularMovies.results.slice(0, 5).map((item: any) => (
-            <MediaCard key={item.id} item={item} type="movie" />
+          {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+          {popularMovies.results.map((item: any) => (
+            <MediaCard key={item.id} item={item} type="movie" providers={item.providers} />
           ))}
         </div>
       </section>
@@ -83,8 +114,9 @@ export default async function Home() {
           </Link>
         </div>
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6">
-          {popularSeries.results.slice(0, 5).map((item: any) => (
-            <MediaCard key={item.id} item={item} type="tv" />
+          {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+          {popularSeries.results.map((item: any) => (
+            <MediaCard key={item.id} item={item} type="tv" providers={item.providers} />
           ))}
         </div>
       </section>

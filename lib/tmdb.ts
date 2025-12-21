@@ -27,3 +27,4 @@ export const getTopRatedMovies = async () => fetchTMDB('/movie/top_rated');
 export const getPopularSeries = async () => fetchTMDB('/tv/popular');
 export const searchMulti = async (query: string) => fetchTMDB('/search/multi', { query });
 export const getDetails = async (type: 'movie' | 'tv', id: string) => fetchTMDB(`/${type}/${id}`);
+export const getWatchProviders = async (type: 'movie' | 'tv', id: string) => fetchTMDB(`/${type}/${id}/watch/providers`);

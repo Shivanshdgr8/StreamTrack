@@ -2,15 +2,17 @@
 
 import { useState } from "react";
 import { useAuth } from "@/context/AuthContext";
+import { useMediaList } from "@/hooks/useMediaList";
 import { Button } from "@/components/ui/button";
 import { updateProfile, deleteUser } from "firebase/auth";
 import { useRouter } from "next/navigation";
 import { Loader2, AlertTriangle, Save, Trash2, User } from "lucide-react";
-import { doc, deleteDoc, collection, getDocs } from "firebase/firestore";
+import { collection, getDocs, writeBatch } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 
 export default function AccountPage() {
     const { user, loading: authLoading } = useAuth();
+    const { stopUpdates } = useMediaList();
     const router = useRouter();
     const [name, setName] = useState(user?.displayName || "");
     const [updating, setUpdating] = useState(false);
@@ -53,6 +55,9 @@ export default function AccountPage() {
 
         setDeleting(true);
         try {
+            // 0. Stop listening to updates to prevent UI churn/performance issues
+            stopUpdates();
+
             // 1. Delete Firestore Data
             // Note: Client SDK can't easily delete internal collections unless we know IDs or structure, 
             // but we can try to delete the known 'list' subcollection documents manually if we had a way to list them.
@@ -60,13 +65,23 @@ export default function AccountPage() {
 
             const listRef = collection(db, "users", user.uid, "list");
             const snapshot = await getDocs(listRef);
-            const deletePromises = snapshot.docs.map(doc => deleteDoc(doc.ref));
-            await Promise.all(deletePromises);
+            const docs = [...snapshot.docs];
+
+            // Delete in batches of 500
+            const batches = [];
+            while (docs.length > 0) {
+                const batch = writeBatch(db);
+                const chunk = docs.splice(0, 500);
+                chunk.forEach(doc => batch.delete(doc.ref));
+                batches.push(batch.commit());
+            }
+            await Promise.all(batches);
 
             // 2. Delete User Auth
             await deleteUser(user);
 
             router.push("/");
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (error: any) {
             console.error(error);
             if (error.code === 'auth/requires-recent-login') {

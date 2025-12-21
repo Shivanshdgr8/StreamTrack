@@ -2,12 +2,11 @@
 
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
-import { Button } from "./ui/button"; // Placeholder, will create later or use raw tailwind
 import { LogOut, Search, User as UserIcon, Settings } from "lucide-react";
 import Logo from "./Logo";
 
 export default function Navbar() {
-    const { user, signInWithGoogle, logout } = useAuth();
+    const { user, logout } = useAuth();
 
     return (
         <nav className="fixed top-0 w-full z-50 bg-black/50 backdrop-blur-md border-b border-white/10">

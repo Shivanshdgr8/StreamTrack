@@ -1,6 +1,6 @@
 'use server'
 
-import { searchMulti } from "@/lib/tmdb";
+import { searchMulti, getWatchProviders } from "@/lib/tmdb";
 
 export async function searchContent(query: string) {
     try {
@@ -9,5 +9,16 @@ export async function searchContent(query: string) {
     } catch (error) {
         console.error("Search error:", error);
         return [];
+    }
+}
+
+export async function fetchWatchProviders(type: 'movie' | 'tv', id: string) {
+    try {
+        const data = await getWatchProviders(type, id);
+        // Default to IN (India) or US as fallback
+        return data?.results?.['IN']?.flatrate || data?.results?.['US']?.flatrate || null;
+    } catch (error) {
+        console.error("Provider fetch error:", error);
+        return null;
     }
 }

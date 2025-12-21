@@ -6,6 +6,7 @@ import { Check, Plus, Eye, EyeOff } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 
 interface CardActionsProps {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     media: any;
     type: MediaType;
     className?: string;
@@ -20,8 +21,8 @@ export default function CardActions({
     showWatchlistBtn = true,
     showWatchedBtn = true
 }: CardActionsProps) {
-    const { user, signInWithGoogle } = useAuth();
-    const { addToStatus, removeFromList, getItemStatus, loading } = useMediaList();
+    const { user } = useAuth();
+    const { addToStatus, removeFromList, getItemStatus } = useMediaList();
     const status = getItemStatus(media.tmdbId || media.id, type);
 
 

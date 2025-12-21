@@ -1,4 +1,4 @@
-import { getDetails, TMDB_IMAGE_BASE_URL } from "@/lib/tmdb";
+import { getDetails, getWatchProviders, TMDB_IMAGE_BASE_URL } from "@/lib/tmdb";
 import { MediaType } from "@/hooks/useMediaList";
 import Image from "next/image";
 import MediaActions from "@/components/MediaActions";
@@ -14,7 +14,14 @@ interface PageProps {
 export default async function DetailsPage({ params }: PageProps) {
     const { type, id } = await params;
     const mediaType = type as MediaType;
-    const media = await getDetails(mediaType, id);
+    const mediaPromise = getDetails(mediaType, id);
+    const providersPromise = getWatchProviders(mediaType, id);
+    const [media, providersData] = await Promise.all([mediaPromise, providersPromise]);
+
+    // Default to IN (India) or US as fallback
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const providers = providersData?.results?.['IN'] || providersData?.results?.['US'];
+    const flatrate = providers?.flatrate || [];
 
     return (
         <div className="min-h-screen pb-20">
@@ -46,6 +53,7 @@ export default async function DetailsPage({ params }: PageProps) {
                             </span>
                             <span>{media.release_date || media.first_air_date}</span>
                             <span className="bg-white/10 px-2 py-0.5 rounded text-sm">
+                                {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                                 {media.genres?.map((g: any) => g.name).join(', ')}
                             </span>
                             {media.runtime && <span>{media.runtime} min</span>}
@@ -69,7 +77,26 @@ export default async function DetailsPage({ params }: PageProps) {
                     {media.tagline && (
                         <div className="bg-white/5 p-6 rounded-xl border border-white/10">
                             <h3 className="text-sm uppercase tracking-wider text-gray-400 mb-2">Tagline</h3>
-                            <p className="italic text-gray-200">"{media.tagline}"</p>
+                            <p className="italic text-gray-200">&quot;{media.tagline}&quot;</p>
+                        </div>
+                    )}
+
+                    {flatrate && flatrate.length > 0 && (
+                        <div className="bg-white/5 p-6 rounded-xl border border-white/10 mt-6">
+                            <h3 className="text-sm uppercase tracking-wider text-gray-400 mb-4">Available on</h3>
+                            <div className="flex flex-wrap gap-3">
+                                {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+                                {flatrate.map((provider: any) => (
+                                    <div key={provider.provider_id} className="relative w-12 h-12 rounded-lg overflow-hidden shadow-sm" title={provider.provider_name}>
+                                        <Image
+                                            src={`${TMDB_IMAGE_BASE_URL}${provider.logo_path}`}
+                                            alt={provider.provider_name}
+                                            fill
+                                            className="object-cover"
+                                        />
+                                    </div>
+                                ))}
+                            </div>
                         </div>
                     )}
                 </div>

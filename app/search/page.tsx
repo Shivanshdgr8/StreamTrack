@@ -1,13 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { searchContent } from "../actions";
+import { searchContent } from "@/app/actions";
 import { Search as SearchIcon, Loader2 } from "lucide-react";
-import Link from "next/link";
 import MediaCard from "@/components/MediaCard";
 
 export default function SearchPage() {
     const [query, setQuery] = useState("");
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [results, setResults] = useState<any[]>([]);
     const [loading, setLoading] = useState(false);
     const [searched, setSearched] = useState(false);

@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { TMDB_IMAGE_BASE_URL } from "@/lib/tmdb";
 import CardActions from "@/components/CardActions";
+import ProviderIcons from "@/components/ProviderIcons";
 import { MediaItem } from "@/hooks/useMediaList";
 import { MediaType } from "@/hooks/useMediaList";
 
@@ -13,9 +14,11 @@ interface MediaCardProps {
     type?: MediaType;
     priority?: boolean;
     className?: string;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    providers?: any[];
 }
 
-export default function MediaCard({ item, type, priority = false, className = "" }: MediaCardProps) {
+export default function MediaCard({ item, type, priority = false, className = "", providers }: MediaCardProps) {
     const mediaType = type || item.media_type || item.type;
     const title = item.title || item.name;
     const date = item.release_date || item.first_air_date || '';
@@ -36,6 +39,15 @@ export default function MediaCard({ item, type, priority = false, className = ""
                 className="object-cover"
                 priority={priority}
             />
+
+            {/* Always Visible Provider Icons */}
+            <div className="absolute top-2 right-2 z-10">
+                <ProviderIcons
+                    type={mediaType}
+                    id={(item.tmdbId || item.id).toString()}
+                    providers={providers}
+                />
+            </div>
 
             {/* Overlay Gradient */}
             <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-4">
